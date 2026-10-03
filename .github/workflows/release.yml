@@ -45,8 +45,21 @@ jobs:
       # npm trusts this workflow through OIDC, so there is no token. The
       # version is staged on npm and goes live once a maintainer approves it
       # with 2FA: npm stage list, then npm stage approve <stage-id>.
+      # A version already on npm, such as a first release published by hand or
+      # a rerun of this workflow, is left alone.
+      - name: Check whether this version is on npm
+        id: npm
+        run: |
+          package="$(node -p "require('./package.json').name")@$(node -p "require('./package.json').version")"
+          if npm view "$package" version > /dev/null 2>&1; then
+            echo "$package is already on npm, so it won't be staged."
+            echo "published=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Update npm for trusted publishing
+        if: steps.npm.outputs.published != 'true'
         run: npm install --global npm@^11.21.0
 
       - name: Stage the release on npm
+        if: steps.npm.outputs.published != 'true'
         run: npm stage publish . --access public --provenance
