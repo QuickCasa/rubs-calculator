@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  release:
+    name: Check, pack and stage the release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - run: npm ci
+
+      - name: Confirm the tag matches package.json
+        run: |
+          expected="v$(node -p "require('./package.json').version")"
+          if [ "$GITHUB_REF_NAME" != "$expected" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match package.json version $expected"
+            exit 1
+          fi
+
+      - run: npm run check
+
+      - name: Pack the package
+        run: npm pack
+
+      - name: Create the GitHub release
+        uses: softprops/action-gh-release@v3
+        with:
+          generate_release_notes: true
+          files: quickcasa-rubs-calculator-*.tgz
+
+      # npm trusts this workflow through OIDC, so there is no token. The
+      # version is staged on npm and goes live once a maintainer approves it
+      # with 2FA: npm stage list, then npm stage approve <stage-id>.
+      - name: Update npm for trusted publishing
+        run: npm install --global npm@^11.21.0
+
+      - name: Stage the release on npm
+        run: npm stage publish . --access public --provenance

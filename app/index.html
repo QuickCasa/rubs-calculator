@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en-CA">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Free RUBS Calculator for Utility Billing | QuickCasa</title>
+    <meta
+      name="description"
+      content="Split a utility bill across rental units by occupants, square footage, bedrooms or a mix. Free and open source, with the formula shown for every unit." />
+    <link rel="stylesheet" href="./styles.css" />
+    <script type="module" src="./main.ts"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href="https://quickcasa.ai"
+          >QuickCasa <span>RUBS Calculator</span></a
+        >
+        <nav aria-label="Project links">
+          <a href="https://github.com/QuickCasa/rubs-calculator">GitHub</a>
+          <a href="https://www.npmjs.com/package/@quickcasa/rubs-calculator"
+            >npm</a
+          >
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="wrap">
+          <h1>Free RUBS calculator for splitting utility bills</h1>
+          <p class="lede">
+            Split a building's utility bill across its units by occupants,
+            square footage, bedrooms or a mix. Every charge comes with the
+            formula behind it, and nothing you enter leaves your browser.
+          </p>
+        </div>
+      </section>
+
+      <form id="calculator" class="wrap calculator" novalidate>
+        <fieldset class="panel">
+          <legend><span class="step">1</span> The bill</legend>
+          <div class="grid">
+            <label class="field">
+              <span>Bill total</span>
+              <input
+                id="total"
+                name="total"
+                inputmode="decimal"
+                autocomplete="off"
+                placeholder="412.18" />
+            </label>
+            <label class="field">
+              <span>Currency</span>
+              <select id="currency" name="currency">
+                <option value="CAD">CAD</option>
+                <option value="USD">USD</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Days the bill covers</span>
+              <input
+                id="period-days"
+                name="periodDays"
+                inputmode="numeric"
+                autocomplete="off" />
+            </label>
+          </div>
+          <div class="grid">
+            <label class="field">
+              <span>Common area</span>
+              <select id="common-area-type" name="commonAreaType">
+                <option value="none">No deduction</option>
+                <option value="percent">A percentage of the bill</option>
+                <option value="amount">A fixed amount</option>
+              </select>
+            </label>
+            <label class="field" id="common-area-value-field">
+              <span id="common-area-value-label">Common area percentage</span>
+              <input
+                id="common-area-value"
+                name="commonAreaValue"
+                inputmode="decimal"
+                autocomplete="off" />
+            </label>
+          </div>
+          <p class="hint">
+            The owner pays this part of the bill, which covers shared spaces
+            such as hallways, laundry rooms and landscaping.
+          </p>
+        </fieldset>
+
+        <fieldset class="panel">
+          <legend><span class="step">2</span> How to split it</legend>
+          <p class="hint">
+            Pick one or more ways to split the bill and give each a share. The
+            shares must add up to 100%.
+          </p>
+          <div class="methods">
+            <div class="method">
+              <label class="check">
+                <input type="checkbox" id="method-occupants" />
+                Occupants
+              </label>
+              <label class="percent">
+                <input
+                  id="percent-occupants"
+                  inputmode="decimal"
+                  aria-label="Occupants share, percent" />
+                <span aria-hidden="true">%</span>
+              </label>
+            </div>
+            <div class="method">
+              <label class="check">
+                <input type="checkbox" id="method-squareFeet" />
+                Square footage
+              </label>
+              <label class="percent">
+                <input
+                  id="percent-squareFeet"
+                  inputmode="decimal"
+                  aria-label="Square footage share, percent" />
+                <span aria-hidden="true">%</span>
+              </label>
+            </div>
+            <div class="method">
+              <label class="check">
+                <input type="checkbox" id="method-bedrooms" />
+                Bedrooms
+              </label>
+              <label class="percent">
+                <input
+                  id="percent-bedrooms"
+                  inputmode="decimal"
+                  aria-label="Bedrooms share, percent" />
+                <span aria-hidden="true">%</span>
+              </label>
+            </div>
+            <div class="method">
+              <label class="check">
+                <input type="checkbox" id="method-perUnit" />
+                Per unit
+              </label>
+              <label class="percent">
+                <input
+                  id="percent-perUnit"
+                  inputmode="decimal"
+                  aria-label="Per unit share, percent" />
+                <span aria-hidden="true">%</span>
+              </label>
+            </div>
+          </div>
+          <p class="percent-total" id="percent-total" aria-live="polite"></p>
+
+          <details class="more">
+            <summary>Weights by count (optional)</summary>
+            <p class="hint">
+              Some owners count each extra person in a household for less than a
+              full share. List a weight for each count, starting from 0. With
+              <code>0, 1, 1.6, 2.2</code>, one occupant counts as 1, two as 1.6
+              and three as 2.2.
+            </p>
+            <div class="grid">
+              <label class="field">
+                <span>Occupant weights</span>
+                <input
+                  id="weights-occupants"
+                  autocomplete="off"
+                  placeholder="0, 1, 1.6, 2.2, 2.6" />
+              </label>
+              <label class="field">
+                <span>Bedroom weights</span>
+                <input
+                  id="weights-bedrooms"
+                  autocomplete="off"
+                  placeholder="1, 1, 2, 3" />
+              </label>
+            </div>
+            <p class="hint">
+              Bedroom weights also give studios a share. With
+              <code>1, 1, 2, 3</code>, a studio counts the same as a one
+              bedroom.
+            </p>
+          </details>
+
+          <fieldset class="choices">
+            <legend>Empty units</legend>
+            <label class="radio">
+              <input type="radio" name="vacancy" value="owner" />
+              The owner pays for the days a unit was empty
+            </label>
+            <label class="radio">
+              <input type="radio" name="vacancy" value="occupied-units" />
+              Split the whole bill across the units that were occupied
+            </label>
+          </fieldset>
+        </fieldset>
+
+        <fieldset class="panel">
+          <legend><span class="step">3</span> Units</legend>
+          <p class="hint">
+            Fill in the columns your split uses. Leave days occupied blank for a
+            unit that was occupied the whole time, and enter 0 for one that was
+            empty.
+          </p>
+          <div class="table-scroll">
+            <table class="units">
+              <thead>
+                <tr id="units-head"></tr>
+              </thead>
+              <tbody id="units-body"></tbody>
+            </table>
+          </div>
+          <div class="actions">
+            <button type="button" class="button button-primary" id="add-unit">
+              Add a unit
+            </button>
+            <button
+              type="button"
+              class="button button-secondary"
+              id="load-example">
+              Load an example
+            </button>
+            <button
+              type="button"
+              class="button button-secondary"
+              id="clear-units">
+              Clear all units
+            </button>
+          </div>
+          <p class="hint" id="units-status" aria-live="polite"></p>
+
+          <details class="more">
+            <summary>Import units from a CSV</summary>
+            <p class="hint">
+              Choose a file or paste rows with columns for unit, square feet,
+              bedrooms, occupants and days occupied. With a header row, the
+              columns can be in any order. Importing replaces the units above.
+            </p>
+            <label class="field">
+              <span>CSV file</span>
+              <input type="file" id="import-file" accept=".csv,text/csv" />
+            </label>
+            <label class="field">
+              <span>Or paste rows</span>
+              <textarea
+                id="import-text"
+                rows="5"
+                placeholder="Unit,Square feet,Bedrooms,Occupants,Days occupied&#10;101,650,1,1,&#10;102,900,2,3,"></textarea>
+            </label>
+            <div class="actions">
+              <button
+                type="button"
+                class="button button-secondary"
+                id="import-button">
+                Import pasted rows
+              </button>
+            </div>
+          </details>
+        </fieldset>
+
+        <section class="panel results" aria-labelledby="results-heading">
+          <h2 id="results-heading">Charges</h2>
+          <p id="results-status" class="hint" aria-live="polite"></p>
+          <ul id="problems" class="problems" aria-live="polite"></ul>
+          <div id="results" hidden>
+            <dl class="summary" id="summary"></dl>
+            <div class="table-scroll">
+              <table class="charges">
+                <thead>
+                  <tr>
+                    <th scope="col">Unit</th>
+                    <th scope="col" class="number">Charge</th>
+                    <th scope="col" class="number">Share of the bill</th>
+                    <th scope="col">How it was worked out</th>
+                  </tr>
+                </thead>
+                <tbody id="charges-body"></tbody>
+              </table>
+            </div>
+            <div class="actions">
+              <button
+                type="button"
+                class="button button-primary"
+                id="download-csv">
+                Download CSV
+              </button>
+              <button type="button" class="button button-secondary" id="print">
+                Print
+              </button>
+            </div>
+          </div>
+        </section>
+      </form>
+
+      <section class="wrap prose">
+        <h2>How RUBS works</h2>
+        <p>
+          RUBS, or ratio utility billing, splits one master-metered utility bill
+          across the units in a building that don't have their own meters. Each
+          unit pays in proportion to something you can count, such as the people
+          living there or the size of the unit.
+        </p>
+        <p>This calculator works in three steps:</p>
+        <ol>
+          <li>
+            It takes any common area deduction off the top. The owner pays it.
+          </li>
+          <li>
+            It splits what's left by each method's share. With square footage at
+            50%, half of what's left is split by each unit's floor area.
+          </li>
+          <li>
+            It rounds every charge to the cent with the largest remainder
+            method, so the charges and the owner's part add up to the bill
+            exactly and nobody is more than a cent off.
+          </li>
+        </ol>
+        <p>
+          A unit occupied for part of the period pays for the days it was
+          occupied. By default, the owner pays for the days a unit was empty.
+          Occupants are the exception: an empty unit has no occupants, so it has
+          no occupant share to pay.
+        </p>
+
+        <h2>Before you bill tenants</h2>
+        <p>
+          Rules for billing tenants for utilities differ by province, state and
+          city, and your leases have to allow it. Check what applies to your
+          buildings before you send a bill. This calculator does the math, and
+          it isn't legal advice.
+        </p>
+
+        <h2>Use it in your own code</h2>
+        <p>
+          The calculator is an MIT licensed TypeScript library with no
+          dependencies.
+        </p>
+        <pre><code>npm install @quickcasa/rubs-calculator</code></pre>
+        <pre><code>import { allocateBill } from '@quickcasa/rubs-calculator'
+
+const allocation = allocateBill({
+  totalCents: 41_218,
+  periodDays: 30,
+  methods: [{ factor: 'occupants', percent: 100 }],
+  units: [
+    { id: '101', occupants: 2 },
+    { id: '102', occupants: 3 },
+  ],
+})</code></pre>
+        <p>
+          The
+          <a href="https://github.com/QuickCasa/rubs-calculator#readme"
+            >README</a
+          >
+          covers every option.
+        </p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p>
+          Built by <a href="https://quickcasa.ai">QuickCasa</a> in Kitchener,
+          Ontario. MIT licensed, with the source on
+          <a href="https://github.com/QuickCasa/rubs-calculator">GitHub</a>.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

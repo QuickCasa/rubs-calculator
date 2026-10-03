@@ -1,0 +1,34 @@
+name: Wrong split or bug
+description: The calculator splits a bill wrong, rejects a bill it should accept, or the page breaks.
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What you expected, and what you got instead.
+    validations:
+      required: true
+  - type: textarea
+    id: bill
+    attributes:
+      label: The bill
+      description: The total, the billing period, the common area deduction, the methods and their percentages, and the vacancy option.
+    validations:
+      required: true
+  - type: textarea
+    id: units
+    attributes:
+      label: The units
+      description: The smallest set of units that shows the problem. A CSV export from the calculator page works well. Please leave out tenant names.
+      render: text
+  - type: textarea
+    id: expected
+    attributes:
+      label: What each unit should pay
+      description: And how you worked it out, if the problem is the amounts.
+  - type: input
+    id: where
+    attributes:
+      label: Where you saw it
+      placeholder: For example, the calculator page in Firefox 131, or version 1.0.0 of the library in Node.js 22

@@ -1,0 +1,62 @@
+{
+  "name": "@quickcasa/rubs-calculator",
+  "version": "1.0.0",
+  "description": "A free, open source RUBS (ratio utility billing) calculator. Splits a utility bill across units by occupants, square footage, bedrooms or a mix, and shows the math for every unit.",
+  "keywords": [
+    "rubs",
+    "ratio-utility-billing",
+    "utility-billing",
+    "property-management",
+    "multifamily",
+    "rent",
+    "calculator"
+  ],
+  "homepage": "https://quickcasa.github.io/rubs-calculator/",
+  "bugs": {
+    "url": "https://github.com/QuickCasa/rubs-calculator/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/QuickCasa/rubs-calculator.git"
+  },
+  "license": "MIT",
+  "author": "QuickCasa (https://quickcasa.ai)",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "site": "vite build",
+    "dev": "vite",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run format:check && npm run typecheck && npm test && npm run build && npm run lint && npm run site"
+  },
+  "devDependencies": {
+    "@quickcasa/eslint-config": "^1.0.0",
+    "@types/node": "^22.20.5",
+    "@typescript/native": "npm:typescript@^7.0.2",
+    "eslint": "^10.12.0",
+    "jsdom": "^30.1.1",
+    "prettier": "^3.9.9",
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
+    "vite": "^8.3.2",
+    "vitest": "^5.0.3"
+  }
+}
