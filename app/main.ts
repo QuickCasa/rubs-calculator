@@ -1,3 +1,4 @@
+import '@fontsource-variable/space-grotesk/wght.css'
 import './styles.css'
 import { allocateBill, RubsInputError } from '../src/index.js'
 import type { Factor } from '../src/index.js'
